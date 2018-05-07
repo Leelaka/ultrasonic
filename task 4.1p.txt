@@ -1,0 +1,59 @@
+#include "mbed.h"
+#include "ultrasonic.h" //library 
+
+DigitalOut close (p28); //green led 
+DigitalOut closer (p26); // yellow led 
+DigitalOut far (LED1); // LED 1 blue in med
+DigitalOut far2 (LED2); // LED 2 blue in med
+DigitalOut far3 (LED3); //LED 3 blue in med
+DigitalOut far4 (LED4); //LED 4 blue in med
+AnalogIn trig (p17); // trig pin of ultrasonic sensor
+AnalogOut echo (p18); // echo pin of ultrasonic sensor
+
+ void dist(int distance)
+{
+    if(distance < 200 && distance > 100)  // within this range the led blue will blink (far)
+    {
+        far = 1;
+        far2 = 1;
+        far3 = 1;
+        far4 = 1;
+        }
+        else 
+        {
+            far = 0;
+            far2 = 0;
+            far3 = 0;
+            far4 = 0;
+            } 
+        if (distance < 100 && distance > 50) // within this range the led green will blink (close)
+        {
+            wait(0.37); //blinks until the object is taken off as a loop
+            close = 1;
+            wait(0.37);
+            close = 0; 
+            }
+            else if(distance < 50) // within this range the led yellow will blink (close)
+            {
+              wait(0.1); // blink more faster till the object is taken off.
+              closer = 1;
+              wait(0.1);
+              closer = 0;
+              } 
+              
+   }                         
+    
+ultrasonic mu(p17, p18, 0.1, 1, &dist);    //trig pin on p17, echo pin on p18
+                                        //have updates every .1 seconds and a timeout after 1
+                                        //second, and call dist when the distance changes
+
+int main()
+{
+    mu.startUpdates();//start mesuring the distance
+    while(1)
+    {
+        
+        mu.checkDistance();     //call checkDistance() as much as possible, as this is where
+                                //the class checks if dist needs to be called.
+    }
+}
